@@ -13,21 +13,18 @@ ReWater löst dieses Problem, indem öffentliche Trinkwasserbrunnen und Nachfül
 
 ## ❗ Problemstellung
 
-Unsere Zielgruppe sind vor allem Touristinnen und Touristen, die auf **ökonomische und ökologische Nachhaltigkeit** achten.
+Unsere Problemstellung fokussiert sich auf Touristinnen und Touristen, die auf **ökonomische und ökologische Nachhaltigkeit** achten.
 
-Das Hauptproblem ist eine **Wissenslücke**:
+Das Hauptproblem ist eine **Wissenslücke**. Viele Touristinnen und Touristen sind sich nicht bewusst, dass es in der Schweiz viele kostenlose Trinkwasserbrunnen und Nachfüllmöglichkeiten gibt. Deshalb kaufen sie unterwegs oft PET-Flaschen, obwohl sie kostenlos Wasser nachfüllen könnten.
 
-Viele Personen wissen nicht, dass es in ihrer Nähe kostenlose Trinkwasserstellen gibt. Dadurch kaufen sie oft PET-Flaschen, obwohl es eine kostenlose und nachhaltigere Alternative gibt.
-
-Das führt zu:
+Diese fehlende Information führt zu:
 
 - unnötigem Kauf von PET-Flaschen
-- mehr Plastikabfall
+- mehr Plastikverbrauch und Abfall
 - höheren Kosten für Touristinnen und Touristen
-- weniger Nutzung vorhandener Trinkwasser-Infrastruktur
+- weniger Nutzung der vorhandenen Trinkwasser-Infrastruktur
 
-In der Schweiz gibt es viele öffentliche Brunnen mit sauberem Trinkwasser. Diese sind jedoch für Touristinnen und Touristen oft nicht gut sichtbar.
-
+ReWater möchte diese Wissenslücke schliessen, indem kostenlose Trinkwasserstellen sichtbar und einfach zugänglich gemacht werden.
 ---
 
 ## 🎯 Zielgruppe
