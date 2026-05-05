@@ -151,6 +151,12 @@ Für das Projekt könnten folgende Technologien verwendet werden:
 - QR-Code-Zugriff
 
 ---
+#SW Struktur
+rewater/
+├── index.html
+├── style.css
+├── script.js
+└── assets/
 
 ## 🚀 Vision
 
