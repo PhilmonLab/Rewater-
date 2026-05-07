@@ -20,6 +20,7 @@ let authMode = "register";
 let fbDb = null;
 let currentUser = null;
 let currentImpact = getDefaultImpactData();
+let currentStationComments = [];
 
 // ── Firebase setup ────────────────────────────────────────────────────────────
 // HOW TO GET YOUR CONFIG (5 minutes):
@@ -218,8 +219,25 @@ const translations = {
     startNavigation: "Start navigation",
     recordRefill: "I refilled here",
     refillSaved: "Refill saved to your impact.",
+    refillSaving: "Saving your refill...",
+    refillRegistered: "Refill registered: {amount} ml saved {co2} kg CO₂ and CHF {money}.",
+    refillSaveFailed: "Refill could not be saved. Please try again.",
+    chooseRefillAmount: "How much did you refill?",
+    customRefillLabel: "Custom amount in ml",
+    saveCustomRefill: "Save",
+    invalidRefillAmount: "Please enter a refill amount greater than 0 ml.",
     signInToTrack: "Sign in to track your refill impact.",
     reportIssue: "Report issue",
+    commentsTitle: "Community notes",
+    noCommentsYet: "No notes yet.",
+    reportCommentLabel: "Share your experience",
+    reportCommentPlaceholder: "Write up to 30 words",
+    postComment: "Post",
+    commentPosted: "Thanks, your note was posted.",
+    commentPostFailed: "Your note could not be posted: {reason}",
+    commentTooLong: "Please keep your note to 30 words or fewer.",
+    readMore: "Read more",
+    showLess: "Show less",
     savedTitle: "Saved fountains",
     savedSubtitle: "Your favorite refill spots",
     drinkableZurich: "Drinkable · Zürich",
@@ -325,8 +343,25 @@ const translations = {
     startNavigation: "Navigation starten",
     recordRefill: "Hier nachgefüllt",
     refillSaved: "Nachfüllung wurde deinem Impact hinzugefügt.",
+    refillSaving: "Deine Nachfüllung wird gespeichert...",
+    refillRegistered: "Nachfüllung registriert: {amount} ml sparen {co2} kg CO₂ und CHF {money}.",
+    refillSaveFailed: "Nachfüllung konnte nicht gespeichert werden. Bitte versuche es erneut.",
+    chooseRefillAmount: "Wie viel hast du nachgefüllt?",
+    customRefillLabel: "Eigene Menge in ml",
+    saveCustomRefill: "Speichern",
+    invalidRefillAmount: "Bitte gib eine Nachfüllmenge über 0 ml ein.",
     signInToTrack: "Melde dich an, um deinen Nachfüll-Impact zu speichern.",
     reportIssue: "Problem melden",
+    commentsTitle: "Community-Notizen",
+    noCommentsYet: "Noch keine Notizen.",
+    reportCommentLabel: "Teile deine Erfahrung",
+    reportCommentPlaceholder: "Schreibe bis zu 30 Wörter",
+    postComment: "Posten",
+    commentPosted: "Danke, deine Notiz wurde gepostet.",
+    commentPostFailed: "Deine Notiz konnte nicht gepostet werden: {reason}",
+    commentTooLong: "Bitte halte deine Notiz bei maximal 30 Wörtern.",
+    readMore: "Mehr lesen",
+    showLess: "Weniger anzeigen",
     savedTitle: "Gespeicherte Brunnen",
     savedSubtitle: "Deine liebsten Nachfüllorte",
     drinkableZurich: "Trinkbar · Zürich",
@@ -438,6 +473,9 @@ function applyLanguage(language) {
     const introKey = authMode === "signin" ? "signInIntro" : "registerIntro";
     authIntro.textContent = dictionary[introKey];
   }
+
+  renderStationComments(currentStationComments);
+  updateReportWordCount();
 }
 
 function toggleLanguage() {
@@ -1314,6 +1352,12 @@ function updateDetailPage() {
 
   const navigationButton = detailPage.querySelector(".primary-btn");
   navigationButton.onclick = () => openGoogleMapsDirections(selectedStation);
+
+  resetRefillConfirmation();
+  setDetailRefillStatus("");
+  hideRefillAmountOptions();
+  hideReportIssueBox();
+  loadStationComments(selectedStation);
 }
 
 function initDetailMap() {
@@ -1466,6 +1510,7 @@ function getDefaultImpactData() {
     bottlesRefilled: 0,
     co2SavedKg: 0,
     moneySavedChf: 0,
+    totalRefillMl: 0,
     savedStationIds: [],
     savedStations: [],
     weeklyRefills: {
@@ -1484,6 +1529,7 @@ function normalizeImpactData(data = {}) {
     bottlesRefilled: Number(data.bottlesRefilled) || defaults.bottlesRefilled,
     co2SavedKg: Number(data.co2SavedKg) || defaults.co2SavedKg,
     moneySavedChf: Number(data.moneySavedChf) || defaults.moneySavedChf,
+    totalRefillMl: Number(data.totalRefillMl) || defaults.totalRefillMl,
     savedStationIds: Array.isArray(data.savedStationIds) ? data.savedStationIds : defaults.savedStationIds,
     savedStations: Array.isArray(data.savedStations) ? data.savedStations : defaults.savedStations,
     weeklyRefills: {
@@ -1535,7 +1581,7 @@ async function saveUserImpact() {
   }, { merge: true });
 }
 
-async function recordRefillAtSelectedStation() {
+function showRefillAmountOptions() {
   if (!selectedStation) {
     return;
   }
@@ -1546,6 +1592,51 @@ async function recordRefillAtSelectedStation() {
     setAuthStatus(translations[currentLanguage].signInToTrack);
     return;
   }
+
+  const panel = document.getElementById("refill-amount-panel");
+  if (panel) {
+    panel.classList.remove("hidden");
+  }
+  setDetailRefillStatus(translations[currentLanguage].chooseRefillAmount);
+}
+
+function hideRefillAmountOptions() {
+  const panel = document.getElementById("refill-amount-panel");
+  if (panel) {
+    panel.classList.add("hidden");
+  }
+}
+
+function recordCustomRefillAmount() {
+  const input = document.getElementById("custom-refill-ml");
+  const amountMl = Number(input?.value);
+  recordRefillAtSelectedStation(amountMl);
+}
+
+async function recordRefillAtSelectedStation(amountMl) {
+  if (!selectedStation) {
+    return;
+  }
+
+  if (!currentUser) {
+    showPage("me");
+    showAuthOptions("signin");
+    setAuthStatus(translations[currentLanguage].signInToTrack);
+    return;
+  }
+
+  const refillMl = Math.round(Number(amountMl));
+  if (!Number.isFinite(refillMl) || refillMl <= 0) {
+    setDetailRefillStatus(translations[currentLanguage].invalidRefillAmount);
+    return;
+  }
+
+  const recordButton = document.getElementById("record-refill-btn");
+  if (recordButton) {
+    recordButton.disabled = true;
+    recordButton.textContent = translations[currentLanguage].refillSaving;
+  }
+  setDetailRefillStatus(translations[currentLanguage].refillSaving);
 
   const stationId = getStationStorageId(selectedStation);
   const savedStationIds = new Set(currentImpact.savedStationIds || []);
@@ -1571,12 +1662,17 @@ async function recordRefillAtSelectedStation() {
     weeklyRefills[weekdayKey] = (Number(weeklyRefills[weekdayKey]) || 0) + 1;
   }
 
+  const refillLiters = refillMl / 1000;
+  const refillCo2SavedKg = Number((refillLiters * 0.03).toFixed(3));
+  const refillMoneySavedChf = Math.round(refillLiters * 100) / 100;
   const bottlesRefilled = (Number(currentImpact.bottlesRefilled) || 0) + 1;
+  const previousImpact = { ...currentImpact };
   currentImpact = {
     ...currentImpact,
     bottlesRefilled,
-    co2SavedKg: Number((bottlesRefilled * 0.025).toFixed(2)),
-    moneySavedChf: Number((bottlesRefilled * 1.5).toFixed(2)),
+    totalRefillMl: (Number(currentImpact.totalRefillMl) || 0) + refillMl,
+    co2SavedKg: Number(((Number(currentImpact.co2SavedKg) || 0) + refillCo2SavedKg).toFixed(3)),
+    moneySavedChf: Number(((Number(currentImpact.moneySavedChf) || 0) + refillMoneySavedChf).toFixed(2)),
     savedStationIds: [...savedStationIds],
     savedStations,
     weeklyRefills,
@@ -1584,8 +1680,246 @@ async function recordRefillAtSelectedStation() {
   };
 
   updateImpactDashboard(currentImpact);
-  await saveUserImpact();
-  showNearMeStatus(translations[currentLanguage].refillSaved);
+  try {
+    await saveUserImpact();
+    showNearMeStatus(translations[currentLanguage].refillSaved);
+    hideRefillAmountOptions();
+    showRefillRegisteredConfirmation(recordButton, {
+      amountMl: refillMl,
+      co2SavedKg: refillCo2SavedKg,
+      moneySavedChf: refillMoneySavedChf
+    });
+  } catch (error) {
+    console.error(error);
+    currentImpact = previousImpact;
+    updateImpactDashboard(currentImpact);
+    setDetailRefillStatus(translations[currentLanguage].refillSaveFailed);
+    resetRefillConfirmation(recordButton);
+  }
+}
+
+function showRefillRegisteredConfirmation(button, refill) {
+  const message = translations[currentLanguage].refillRegistered
+    .replace("{amount}", refill.amountMl)
+    .replace("{co2}", refill.co2SavedKg.toFixed(3))
+    .replace("{money}", refill.moneySavedChf.toFixed(2));
+
+  setDetailRefillStatus(message);
+
+  if (!button) {
+    return;
+  }
+
+  button.disabled = false;
+  button.classList.add("refill-confirmed");
+  button.textContent = translations[currentLanguage].refillSaved;
+
+  window.setTimeout(() => {
+    resetRefillConfirmation(button);
+  }, 2400);
+}
+
+function resetRefillConfirmation(button = document.getElementById("record-refill-btn")) {
+  if (!button) {
+    return;
+  }
+
+  button.disabled = false;
+  button.classList.remove("refill-confirmed");
+  button.textContent = translations[currentLanguage].recordRefill;
+}
+
+function setDetailRefillStatus(message) {
+  const status = document.getElementById("detail-refill-status");
+  if (!status) {
+    return;
+  }
+
+  status.textContent = message;
+  status.classList.toggle("hidden", !message);
+}
+
+function showReportIssueBox() {
+  if (!selectedStation) {
+    return;
+  }
+
+  if (!currentUser) {
+    showPage("me");
+    showAuthOptions("signin");
+    setAuthStatus(translations[currentLanguage].signInToTrack);
+    return;
+  }
+
+  const panel = document.getElementById("report-issue-panel");
+  if (panel) {
+    panel.classList.remove("hidden");
+  }
+  updateReportWordCount();
+  setReportStatus("");
+}
+
+function hideReportIssueBox() {
+  const panel = document.getElementById("report-issue-panel");
+  if (panel) {
+    panel.classList.add("hidden");
+  }
+
+  const textarea = document.getElementById("report-comment");
+  if (textarea) {
+    textarea.value = "";
+  }
+  updateReportWordCount();
+  setReportStatus("");
+}
+
+function getCommentWords(text) {
+  return String(text || "").trim().split(/\s+/).filter(Boolean);
+}
+
+function updateReportWordCount() {
+  const textarea = document.getElementById("report-comment");
+  const counter = document.getElementById("report-word-count");
+  if (!textarea || !counter) {
+    return;
+  }
+
+  const words = getCommentWords(textarea.value);
+  if (words.length > 30) {
+    textarea.value = words.slice(0, 30).join(" ");
+  }
+  counter.textContent = `${getCommentWords(textarea.value).length}/30`;
+}
+
+async function postStationComment() {
+  if (!selectedStation) {
+    return;
+  }
+
+  if (!currentUser) {
+    showPage("me");
+    showAuthOptions("signin");
+    setAuthStatus(translations[currentLanguage].signInToTrack);
+    return;
+  }
+
+  const textarea = document.getElementById("report-comment");
+  const words = getCommentWords(textarea?.value);
+  if (!words.length || words.length > 30) {
+    setReportStatus(translations[currentLanguage].commentTooLong);
+    return;
+  }
+
+  const comment = {
+    id: `${currentUser.uid}-${Date.now()}`,
+    uid: currentUser.uid,
+    author: currentUser.displayName || currentUser.email || "Community member",
+    text: words.join(" "),
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    if (!fbDb) {
+      throw new Error("Firestore unavailable");
+    }
+
+    await fbDb.collection("stationComments").doc(getStationCommentDocId(selectedStation)).set({
+      stationId: getStationStorageId(selectedStation),
+      stationName: selectedStation.name,
+      comments: firebase.firestore.FieldValue.arrayUnion(comment),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    currentStationComments = [comment, ...currentStationComments];
+    renderStationComments(currentStationComments);
+    hideReportIssueBox();
+    setDetailRefillStatus(translations[currentLanguage].commentPosted);
+  } catch (error) {
+    console.error(error);
+    setReportStatus(translations[currentLanguage].commentPostFailed.replace("{reason}", error.message || "Please try again."));
+  }
+}
+
+async function loadStationComments(station) {
+  currentStationComments = [];
+  renderStationComments(currentStationComments);
+
+  if (!fbDb || !station) {
+    return;
+  }
+
+  try {
+    const snapshot = await fbDb.collection("stationComments").doc(getStationCommentDocId(station)).get();
+    const comments = snapshot.exists && Array.isArray(snapshot.data().comments)
+      ? snapshot.data().comments
+      : [];
+    currentStationComments = comments.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    renderStationComments(currentStationComments);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function renderStationComments(comments) {
+  const list = document.getElementById("station-comments-list");
+  if (!list) {
+    return;
+  }
+
+  list.innerHTML = "";
+
+  if (!comments.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty-comments";
+    empty.textContent = translations[currentLanguage].noCommentsYet;
+    list.appendChild(empty);
+    return;
+  }
+
+  const shouldCollapse = comments.length > 4;
+  comments.forEach(comment => {
+    const item = document.createElement("article");
+    item.className = "station-comment";
+
+    const author = document.createElement("strong");
+    author.textContent = comment.author || "Community member";
+
+    const text = document.createElement("span");
+    const words = getCommentWords(comment.text);
+    const needsReadMore = shouldCollapse && words.length > 12;
+    text.textContent = needsReadMore ? `${words.slice(0, 12).join(" ")}...` : comment.text;
+
+    item.append(author, text);
+
+    if (needsReadMore) {
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.textContent = translations[currentLanguage].readMore;
+      toggle.onclick = () => {
+        const expanded = toggle.dataset.expanded === "true";
+        toggle.dataset.expanded = expanded ? "false" : "true";
+        text.textContent = expanded ? `${words.slice(0, 12).join(" ")}...` : comment.text;
+        toggle.textContent = expanded ? translations[currentLanguage].readMore : translations[currentLanguage].showLess;
+      };
+      item.appendChild(toggle);
+    }
+
+    list.appendChild(item);
+  });
+}
+
+function setReportStatus(message) {
+  const status = document.getElementById("report-status");
+  if (!status) {
+    return;
+  }
+
+  status.textContent = message;
+  status.classList.toggle("hidden", !message);
+}
+
+function getStationCommentDocId(station) {
+  return encodeURIComponent(getStationStorageId(station));
 }
 
 function getStationStorageId(station) {
@@ -1608,8 +1942,8 @@ function updateImpactDashboard(impact) {
   const uniqueStations = new Set(data.savedStationIds || []);
 
   setElementText("stat-bottles", data.bottlesRefilled);
-  setElementText("stat-co2", `${data.co2SavedKg.toFixed(2)} kg`);
-  setElementText("stat-money", `CHF ${Math.round(data.moneySavedChf)}`);
+  setElementText("stat-co2", `${data.co2SavedKg.toFixed(3)} kg`);
+  setElementText("stat-money", `CHF ${data.moneySavedChf.toFixed(2)}`);
   setElementText("stat-fountains", uniqueStations.size);
 
   const weekdays = ["mon", "tue", "wed", "thu", "fri"];
@@ -1810,6 +2144,7 @@ document.addEventListener("DOMContentLoaded", () => {
   applyLanguage(currentLanguage);
   initMap();
   document.querySelector(".search-box input").addEventListener("input", handleStationSearch);
+  document.getElementById("report-comment")?.addEventListener("input", updateReportWordCount);
 
   // Restore session automatically on every page load
   if (firebaseReady) {
