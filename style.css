@@ -282,6 +282,83 @@ hr {
   border: 1px solid #c5ddd6;
 }
 
+.secondary-btn.refill-confirmed {
+  background: #e5fbf2;
+  border-color: #28c994;
+  color: #12664f;
+}
+
+.primary-btn:disabled,
+.secondary-btn:disabled {
+  cursor: default;
+  opacity: 0.78;
+}
+
+.detail-refill-status {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border: 1px solid #b7d7ce;
+  border-radius: 8px;
+  background: #e5fbf2;
+  color: #12664f;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.refill-amount-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid #b7d7ce;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 24px rgba(22, 61, 53, 0.08);
+}
+
+.refill-amount-panel > button,
+.custom-refill-box button {
+  min-height: 44px;
+  border: 1px solid #47c89f;
+  border-radius: 8px;
+  background: #e5fbf2;
+  color: #12664f;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.custom-refill-box {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 7px;
+}
+
+.custom-refill-box label {
+  color: #31554d;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.custom-refill-box div {
+  display: grid;
+  grid-template-columns: 1fr minmax(92px, auto);
+  gap: 8px;
+}
+
+.custom-refill-box input {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid #c5ddd6;
+  border-radius: 8px;
+  color: #173b34;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 0 12px;
+}
+
 .small {
   font-size: 15px;
   padding: 11px;
@@ -423,8 +500,8 @@ hr {
 }
 
 .station-photo-wrap {
-  width: min(100%, 520px);
-  margin: 14px 0 18px;
+  width: 100%;
+  margin: 0;
   border: 1px solid #c5ddd6;
   border-radius: 8px;
   overflow: hidden;
@@ -452,6 +529,117 @@ hr {
   font-size: 18px;
   font-weight: 900;
   text-align: center;
+}
+
+.station-community-row {
+  display: grid;
+  grid-template-columns: minmax(0, 520px) minmax(230px, 1fr);
+  gap: 14px;
+  align-items: stretch;
+  margin: 14px 0 18px;
+}
+
+.station-comments {
+  min-height: 100%;
+  border: 1px solid #c5ddd6;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(22, 61, 53, 0.08);
+}
+
+.station-comments h3 {
+  margin: 0 0 10px;
+}
+
+.station-comments-list {
+  display: grid;
+  gap: 8px;
+}
+
+.station-comment {
+  border: 1px solid #d8e7e2;
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: #f8fffc;
+  color: #31554d;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.station-comment strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #163d35;
+  font-size: 13px;
+}
+
+.station-comment button {
+  margin-top: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #139872;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.empty-comments {
+  color: #627b75;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.report-issue-panel {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid #b7d7ce;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.report-issue-panel label,
+.report-actions span {
+  color: #31554d;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.report-issue-panel textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid #c5ddd6;
+  border-radius: 8px;
+  color: #173b34;
+  font: inherit;
+  font-weight: 700;
+  padding: 10px 12px;
+}
+
+.report-actions {
+  display: grid;
+  grid-template-columns: 1fr minmax(92px, auto);
+  gap: 8px;
+  align-items: center;
+}
+
+.report-actions button {
+  min-height: 42px;
+  border: 1px solid #47c89f;
+  border-radius: 8px;
+  background: #e5fbf2;
+  color: #12664f;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.report-status {
+  margin: 0;
+  color: #12664f;
+  font-weight: 900;
 }
 
 /* Info page */
@@ -939,6 +1127,10 @@ hr {
   .marker-card {
     bottom: 82px;
     width: calc(100vw - 24px);
+  }
+
+  .station-community-row {
+    grid-template-columns: 1fr;
   }
 
   .bottom-nav {
