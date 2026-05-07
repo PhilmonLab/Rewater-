@@ -1,1 +1,356 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReWater</title>
+
+  <!-- Leaflet Map CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <main class="app-shell">
+
+    <!-- MAP PAGE -->
+    <section id="page-map" class="page active">
+      <header class="top-bar">
+        <span class="brand">ReWater</span>
+        <button class="language-toggle" type="button" onclick="toggleLanguage()" aria-label="Change language">🇨🇭</button>
+      </header>
+
+      <div class="search-box">
+        <span class="search-icon">⌕</span>
+        <input type="text" placeholder="Search water station..." data-i18n-placeholder="searchPlaceholder" />
+      </div>
+
+      <div class="filter-row">
+        <button class="chip active" type="button" onclick="selectDrinkable(this)" data-i18n="drinkable">Drinkable</button>
+        <button class="chip" type="button" onclick="selectNearMe(this)" data-i18n="nearMe">Near me</button>
+        <button class="chip free-filter" type="button" onclick="selectFree(this)" data-i18n="free">Free</button>
+      </div>
+      <p id="near-me-status" class="near-me-status hidden" aria-live="polite"></p>
+
+      <div id="map"></div>
+
+      <button class="primary-btn" onclick="findNearestWater()" data-i18n="findNearest">Find nearest water</button>
+
+      <div id="marker-card" class="marker-card hidden">
+        <button class="marker-card-close" type="button" onclick="hideMarkerCard()" aria-label="Close station card">×</button>
+        <div class="drag-line"></div>
+        <h2>Bürkliterrasse Brunnen</h2>
+        <p><span class="dot green"></span> <span data-i18n="drinkableDistance">Drinkable — 220 m away</span></p>
+        <div class="info-box" data-i18n="fountainType">Type: public fountain</div>
+
+        <div class="button-row">
+          <button class="primary-btn small" onclick="startNavigationToSelectedStation()" data-i18n="route">Route</button>
+          <button class="secondary-btn small" onclick="showPage('detail')" data-i18n="details">Details</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DETAIL PAGE -->
+    <section id="page-detail" class="page">
+      <header class="top-bar">
+        <button class="back-btn" onclick="showPage('map')" data-i18n="backToMap">← Back to map</button>
+        <button class="language-toggle" type="button" onclick="toggleLanguage()" aria-label="Change language">🇨🇭</button>
+      </header>
+
+      <div class="detail-map-preview">
+        <div id="detail-route-map" class="detail-route-map" aria-label="Selected refill station map"></div>
+        <div id="detail-distance-badge" class="detail-distance-badge">Distance unavailable</div>
+      </div>
+
+      <p class="status"><span class="dot green"></span> <span data-i18n="safeToDrink">Safe to drink</span></p>
+      <h1>Bürkliterrasse Brunnen</h1>
+
+      <div class="dashed-box" data-i18n="detailDescription">
+        Traditional flowing fountain.<br />
+        Continuously running, always free.<br />
+        Swiss public water network.
+      </div>
+
+      <hr />
+
+      <p class="label" data-i18n="address">Address</p>
+      <p class="value">Bürkliplatz, 8001 Zürich</p>
+
+      <figure id="station-photo-wrap" class="station-photo-wrap hidden">
+        <img id="station-photo" class="station-photo" src="" alt="" loading="lazy" />
+        <figcaption id="station-photo-placeholder" class="station-photo-placeholder">No photo yet</figcaption>
+      </figure>
+
+      <p class="label" data-i18n="hours">Hours</p>
+      <p class="value" data-i18n="alwaysOpen">Always open</p>
+
+      <p class="label" data-i18n="lastChecked">Last checked</p>
+      <p class="value" data-i18n="communityChecked">Community · 2 days ago</p>
+
+      <button class="primary-btn" data-i18n="startNavigation">Start navigation</button>
+      <button class="secondary-btn" type="button" onclick="recordRefillAtSelectedStation()" data-i18n="recordRefill">I refilled here</button>
+      <button class="secondary-btn" data-i18n="reportIssue">Report issue</button>
+    </section>
+
+    <!-- SAVED PAGE -->
+    <section id="page-saved" class="page">
+      <header class="top-bar">
+        <span class="brand">ReWater</span>
+        <button class="language-toggle" type="button" onclick="toggleLanguage()" aria-label="Change language">🇨🇭</button>
+      </header>
+
+      <h1 data-i18n="savedTitle">Saved fountains</h1>
+      <p class="subtitle" data-i18n="savedSubtitle">Your favorite refill spots</p>
+
+      <div class="card">
+        <h2>Bürkliterrasse Brunnen</h2>
+        <p><span class="dot green"></span> <span data-i18n="drinkableZurich">Drinkable · Zürich</span></p>
+        <button class="secondary-btn small" onclick="showPage('detail')" data-i18n="openDetails">Open details</button>
+      </div>
+
+      <div class="card">
+        <h2>Lindenhof Brunnen</h2>
+        <p><span class="dot green"></span> <span data-i18n="drinkableZurich">Drinkable · Zürich</span></p>
+        <button class="secondary-btn small" data-i18n="openDetails">Open details</button>
+      </div>
+    </section>
+
+    <!-- INFO PAGE -->
+    <section id="page-info" class="page">
+      <header class="top-bar">
+        <span class="brand">ReWater</span>
+        <button class="language-toggle" type="button" onclick="toggleLanguage()" aria-label="Change language">🇨🇭</button>
+      </header>
+
+      <h1 data-i18n="guideTitle">Water guide</h1>
+      <p class="subtitle" data-i18n="guideSubtitle">For visitors to Switzerland</p>
+
+      <hr />
+
+      <h3 data-i18n="markersMean">MAP MARKERS MEAN</h3>
+
+      <div class="legend-row">
+        <span class="circle-marker green-border"></span>
+        <div>
+          <strong data-i18n="drinkable">Drinkable</strong>
+          <p data-i18n="safeUse">Safe — use your bottle freely</p>
+        </div>
+      </div>
+
+      <div class="legend-row">
+        <span class="circle-marker red-border"></span>
+        <div>
+          <strong data-i18n="notDrinkable">Not drinkable</strong>
+          <p data-i18n="decorativeOnly">Decorative only — do not drink</p>
+        </div>
+      </div>
+
+      <div class="legend-row">
+        <span class="circle-marker gray-border"></span>
+        <div>
+          <strong data-i18n="unclear">Unclear</strong>
+          <p data-i18n="statusUnconfirmed">Status not confirmed yet</p>
+        </div>
+      </div>
+
+      <hr />
+
+      <h3 data-i18n="goodToKnow">GOOD TO KNOW</h3>
+
+      <div class="dashed-box" data-i18n="guideTipOne">
+        In Switzerland, most street fountains provide clean drinking water from the public network.
+        Look for continuously flowing water — this is a good sign.
+      </div>
+
+      <div class="dashed-box" data-i18n="guideTipTwo">
+        Tap water in Switzerland meets very high standards.
+        Refilling is free, safe, and avoids plastic waste.
+      </div>
+
+      <button class="primary-btn" onclick="showPage('map')" data-i18n="openMap">Open map</button>
+    </section>
+
+    <!-- ME / IMPACT PAGE -->
+    <section id="page-me" class="page">
+      <header class="top-bar">
+        <span class="brand">ReWater</span>
+        <button class="language-toggle" type="button" onclick="toggleLanguage()" aria-label="Change language">🇨🇭</button>
+      </header>
+
+      <h1 data-i18n="impactTitle">My impact</h1>
+      <p class="subtitle" id="impact-subtitle" data-i18n="impactSubtitle">Track your refills & savings</p>
+
+      <div id="logged-out-view">
+        <div class="login-box">
+          <div class="lock-icon">🔒</div>
+          <h2 data-i18n="signInTitle">Sign in to see your saved refills</h2>
+          <p data-i18n="signInText">Your saved water refills, CO₂ saved and badges stay with your account.</p>
+          <button class="primary-btn" onclick="showAuthOptions('signin')" data-i18n="signIn">Sign in</button>
+          <button class="secondary-btn" onclick="showAuthOptions('register')" data-i18n="createAccount">Create account</button>
+        </div>
+
+        <p class="center-text" data-i18n="accountOptional">
+          No account? You can still use the map — stats are optional.
+        </p>
+
+        <div class="demo-entry">
+          <p class="demo-label" data-i18n="demoLabel">Want to see what it looks like?</p>
+          <button class="demo-btn" onclick="enterDemoMode()" data-i18n="tryDemo">Preview as demo user</button>
+        </div>
+      </div>
+
+      <div id="auth-view" class="hidden">
+        <button class="back-btn auth-back" type="button" onclick="showLoggedOutView()" data-i18n="backToImpact">← Back</button>
+
+        <div class="auth-panel">
+          <p class="eyebrow" data-i18n="welcomeLabel">Welcome</p>
+          <h2>ReWater</h2>
+          <p id="auth-intro" data-i18n="registerIntro">Register to access your saved refills, impact stats, and refill history.</p>
+
+          <div class="auth-actions">
+            <button class="auth-provider-btn" type="button" onclick="loginWithProvider('Google')">
+              <span class="provider-icon google-icon">G</span>
+              <span data-i18n="continueGoogle">Continue with Google</span>
+            </button>
+
+            <button class="auth-provider-btn" type="button" onclick="showEmailRegister()">
+              <span class="provider-icon email-icon">@</span>
+              <span data-i18n="continueEmail">Continue with email</span>
+            </button>
+          </div>
+
+          <form id="email-auth-form" class="email-auth-form hidden" onsubmit="submitEmailAuth(event)">
+            <label for="auth-email" data-i18n="emailAddress">Email address</label>
+            <input id="auth-email" type="email" autocomplete="email" required placeholder="you@example.com" />
+
+            <label for="auth-password" data-i18n="password">Password</label>
+            <input id="auth-password" type="password" autocomplete="current-password" required minlength="6" placeholder="••••••••" />
+
+            <button class="primary-btn" type="submit" id="email-submit-btn" data-i18n="createAccount">Create account</button>
+          </form>
+
+          <p id="auth-status" class="auth-status" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <!-- REAL USER view -->
+      <div id="logged-in-view" class="hidden">
+        <div class="user-profile-row">
+          <img id="user-avatar" class="user-avatar" src="" alt="" aria-hidden="true" />
+          <div class="user-info">
+            <strong id="user-display-name"></strong>
+            <span id="user-email-label"></span>
+          </div>
+          <button class="signout-btn" onclick="signOutUser()" data-i18n="signOut">Sign out</button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><strong id="stat-bottles">0</strong><span data-i18n="bottlesRefilled">Bottles refilled</span></div>
+          <div class="stat-card"><strong id="stat-co2">0 kg</strong><span data-i18n="co2Saved">CO₂ saved</span></div>
+          <div class="stat-card"><strong id="stat-money">CHF 0</strong><span data-i18n="moneySaved">Money saved</span></div>
+          <div class="stat-card"><strong id="stat-fountains">0</strong><span data-i18n="fountainsFound">Fountains found</span></div>
+        </div>
+
+        <hr />
+
+        <h3 data-i18n="thisWeek">THIS WEEK</h3>
+        <div class="week-row"><span data-i18n="monday">Mon</span><div class="bar"><div id="bar-mon" style="width:0%"></div></div><span id="cnt-mon">0</span></div>
+        <div class="week-row"><span data-i18n="tuesday">Tue</span><div class="bar"><div id="bar-tue" style="width:0%"></div></div><span id="cnt-tue">0</span></div>
+        <div class="week-row"><span data-i18n="wednesday">Wed</span><div class="bar"><div id="bar-wed" style="width:0%"></div></div><span id="cnt-wed">0</span></div>
+        <div class="week-row"><span data-i18n="thursday">Thu</span><div class="bar"><div id="bar-thu" style="width:0%"></div></div><span id="cnt-thu">0</span></div>
+        <div class="week-row"><span data-i18n="friday">Fri</span><div class="bar"><div id="bar-fri" style="width:0%"></div></div><span id="cnt-fri">0</span></div>
+
+        <hr />
+
+        <h3 data-i18n="badgesTitle">BADGES</h3>
+        <div class="badges">
+          <span class="locked" data-i18n="firstRefill">First refill</span>
+          <span class="locked" data-i18n="tenBottles">10 bottles</span>
+          <span class="locked" data-i18n="explorer">Explorer</span>
+          <span class="locked" data-i18n="fiftyBottles">50 bottles</span>
+          <span class="locked" data-i18n="swissLocal">Swiss local</span>
+        </div>
+      </div>
+
+      <!-- DEMO view (preview only) -->
+      <div id="demo-view" class="hidden">
+        <div class="demo-banner" data-i18n="demoBanner">This is a preview — create an account to track your own impact.</div>
+        <button class="secondary-btn small demo-exit-btn" onclick="exitDemoMode()" data-i18n="exitDemo">← Back to sign in</button>
+
+        <div class="stats-grid" style="margin-top:16px">
+          <div class="stat-card"><strong>34</strong><span data-i18n="bottlesRefilled">Bottles refilled</span></div>
+          <div class="stat-card"><strong>0.85 kg</strong><span data-i18n="co2Saved">CO₂ saved</span></div>
+          <div class="stat-card"><strong>CHF 51</strong><span data-i18n="moneySaved">Money saved</span></div>
+          <div class="stat-card"><strong>12</strong><span data-i18n="fountainsFound">Fountains found</span></div>
+        </div>
+
+        <hr />
+
+        <h3 data-i18n="thisWeek">THIS WEEK</h3>
+        <div class="week-row"><span data-i18n="monday">Mon</span><div class="bar"><div style="width:60%"></div></div><span>3</span></div>
+        <div class="week-row"><span data-i18n="tuesday">Tue</span><div class="bar"><div style="width:100%"></div></div><span>5</span></div>
+        <div class="week-row"><span data-i18n="wednesday">Wed</span><div class="bar"><div style="width:40%"></div></div><span>2</span></div>
+        <div class="week-row"><span data-i18n="thursday">Thu</span><div class="bar"><div style="width:20%"></div></div><span>1</span></div>
+        <div class="week-row"><span data-i18n="friday">Fri</span><div class="bar"><div style="width:0%"></div></div><span>0</span></div>
+
+        <hr />
+
+        <h3 data-i18n="badgesTitle">BADGES</h3>
+        <div class="badges">
+          <span data-i18n="firstRefill">First refill</span>
+          <span data-i18n="tenBottles">10 bottles</span>
+          <span data-i18n="explorer">Explorer</span>
+          <span class="locked" data-i18n="fiftyBottles">50 bottles</span>
+          <span class="locked" data-i18n="swissLocal">Swiss local</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="showPage('map')">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="img">
+            <path d="M3 7.5 9 5l6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5V7.5Z"></path>
+            <path d="M9 5v13.5"></path>
+            <path d="M15 7.5V21"></path>
+          </svg>
+        </span>
+        <span class="nav-label" data-i18n="navMap">Maps</span>
+      </button>
+      <button class="nav-item" onclick="showPage('me')">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="img">
+            <path d="M19 21 12 17 5 21V5.5A2.5 2.5 0 0 1 7.5 3h9A2.5 2.5 0 0 1 19 5.5V21Z"></path>
+            <path d="m9.5 10.5 1.8 1.8 3.4-4"></path>
+          </svg>
+        </span>
+        <span class="nav-label" data-i18n="navSaved">Saved</span>
+      </button>
+      <button class="nav-item" onclick="showPage('info')">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="img">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 10v6"></path>
+            <path d="M12 7h.01"></path>
+          </svg>
+        </span>
+        <span class="nav-label" data-i18n="navInfo">Info</span>
+      </button>
+    </nav>
+  </main>
+
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
 
