@@ -84,10 +84,16 @@
       <p class="label" data-i18n="address">Address</p>
       <p class="value">Bürkliplatz, 8001 Zürich</p>
 
-      <figure id="station-photo-wrap" class="station-photo-wrap hidden">
-        <img id="station-photo" class="station-photo" src="" alt="" loading="lazy" />
-        <figcaption id="station-photo-placeholder" class="station-photo-placeholder">No photo yet</figcaption>
-      </figure>
+      <div class="station-community-row">
+        <figure id="station-photo-wrap" class="station-photo-wrap hidden">
+          <img id="station-photo" class="station-photo" src="" alt="" loading="lazy" />
+          <figcaption id="station-photo-placeholder" class="station-photo-placeholder">No photo yet</figcaption>
+        </figure>
+        <section class="station-comments" aria-live="polite">
+          <h3 data-i18n="commentsTitle">Community notes</h3>
+          <div id="station-comments-list" class="station-comments-list"></div>
+        </section>
+      </div>
 
       <p class="label" data-i18n="hours">Hours</p>
       <p class="value" data-i18n="alwaysOpen">Always open</p>
@@ -96,8 +102,30 @@
       <p class="value" data-i18n="communityChecked">Community · 2 days ago</p>
 
       <button class="primary-btn" data-i18n="startNavigation">Start navigation</button>
-      <button class="secondary-btn" type="button" onclick="recordRefillAtSelectedStation()" data-i18n="recordRefill">I refilled here</button>
-      <button class="secondary-btn" data-i18n="reportIssue">Report issue</button>
+      <button id="record-refill-btn" class="secondary-btn" type="button" onclick="showRefillAmountOptions()" data-i18n="recordRefill">I refilled here</button>
+      <div id="refill-amount-panel" class="refill-amount-panel hidden" aria-label="Choose refill amount">
+        <button type="button" onclick="recordRefillAtSelectedStation(75)">75 ml</button>
+        <button type="button" onclick="recordRefillAtSelectedStation(250)">250 ml</button>
+        <button type="button" onclick="recordRefillAtSelectedStation(500)">500 ml</button>
+        <div class="custom-refill-box">
+          <label for="custom-refill-ml" data-i18n="customRefillLabel">Custom amount in ml</label>
+          <div>
+            <input id="custom-refill-ml" type="number" min="1" step="1" inputmode="numeric" placeholder="ml" />
+            <button type="button" onclick="recordCustomRefillAmount()" data-i18n="saveCustomRefill">Save</button>
+          </div>
+        </div>
+      </div>
+      <p id="detail-refill-status" class="detail-refill-status hidden" aria-live="polite"></p>
+      <button id="report-issue-btn" class="secondary-btn" type="button" onclick="showReportIssueBox()" data-i18n="reportIssue">Report issue</button>
+      <div id="report-issue-panel" class="report-issue-panel hidden">
+        <label for="report-comment" data-i18n="reportCommentLabel">Share your experience</label>
+        <textarea id="report-comment" rows="3" maxlength="240" data-i18n-placeholder="reportCommentPlaceholder" placeholder="Write up to 30 words"></textarea>
+        <div class="report-actions">
+          <span id="report-word-count">0/30</span>
+          <button type="button" onclick="postStationComment()" data-i18n="postComment">Post</button>
+        </div>
+        <p id="report-status" class="report-status hidden" aria-live="polite"></p>
+      </div>
     </section>
 
     <!-- SAVED PAGE -->
@@ -353,4 +381,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
