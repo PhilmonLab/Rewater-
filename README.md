@@ -11,36 +11,20 @@ ReWater löst dieses Problem, indem öffentliche Trinkwasserbrunnen und Nachfül
 
 ---
 
-## ❗ Problemstellung
-
-Unsere Problemstellung fokussiert sich auf Touristinnen und Touristen, die auf **ökonomische und ökologische Nachhaltigkeit** achten.
-
-Das Hauptproblem ist eine **Wissenslücke**. Viele Touristinnen und Touristen sind sich nicht bewusst, dass es in der Schweiz viele kostenlose Trinkwasserbrunnen und Nachfüllmöglichkeiten gibt. Deshalb kaufen sie unterwegs oft PET-Flaschen, obwohl sie kostenlos Wasser nachfüllen könnten.
-
-Diese fehlende Information führt zu:
-
-- unnötigem Kauf von PET-Flaschen
-- mehr Plastikverbrauch und Abfall
-- höheren Kosten für Touristinnen und Touristen
-- weniger Nutzung der vorhandenen Trinkwasser-Infrastruktur
-
-ReWater möchte diese Wissenslücke schliessen, indem kostenlose Trinkwasserstellen sichtbar und einfach zugänglich gemacht werden.
----
-
 ## 🎯 Zielgruppe
 
-Unsere Zielgruppen sind:
-
-- Touristinnen und Touristen in der Deutschschweiz
+- Touristinnen und Touristen in der ganzen Schweiz
+- internationale Besucherinnen und Besucher
 - umweltbewusste Personen
 - Personen, die unterwegs Geld sparen möchten
 - Menschen, die keine zusätzliche App installieren wollen
+- Personen, die mit einer wiederverwendbaren Trinkflasche unterwegs sind
 
 ---
 
 ## 🎯 Ziel des Projekts
 
-Unser Ziel ist es, den Kauf von Einweg-PET-Flaschen zu reduzieren.
+Den Kauf von Einweg-PET Flaschen zu reduzieren.
 
 Touristinnen und Touristen sollen einfach und schnell sehen können, wo sie kostenlos Wasser nachfüllen können.
 
@@ -67,26 +51,33 @@ Die Web-App zeigt kostenlose Trinkwasserstationen in der Nähe, zum Beispiel:
 
 ## ✨ Wichtige Funktionen
 
-- 🌐 **Keine App-Installation nötig**  
-  ReWater funktioniert direkt im Browser.
 
-- 📍 **Trinkwasserstationen in der Nähe finden**  
-  Nutzerinnen und Nutzer sehen schnell, wo sie kostenlos Wasser nachfüllen können.
+- **Keine App-Installation nötig**  
+  ReWater funktioniert direkt im Browser und kann über GitHub Pages genutzt werden.
 
-- ✅ **Aktuelle und verifizierte Daten**  
-  Die Daten sollen zuverlässig, aktuell und überprüfbar sein.
+- **Trinkwasserstationen in der Nähe finden**  
+  Nutzer:innen sehen auf einer interaktiven Karte, wo sie kostenlos Wasser nachfüllen können.
 
-- 🗺️ **Routenplaner mit Brunnen-Stopps**  
-  Touristinnen und Touristen können ihre Route planen und Wasserstopps einbauen.
+- **Navigation zu Refill-Stationen**  
+  Über die Detailseite können Nutzer:innen direkt eine Route zur ausgewählten Station öffnen.
 
-- 🌍 **Mehrsprachigkeit**  
-  Die Web-App soll auch für internationale Touristinnen und Touristen einfach verständlich sein.
+- **Nachfüllungen speichern**  
+  Angemeldete Nutzer:innen können eintragen, wie viel Wasser sie nachgefüllt haben.
 
-- 📱 **Mobile Nutzung**  
-  ReWater ist für unterwegs und für Smartphones optimiert.
+- **CO₂- und Geldersparnis berechnen**  
+  Die App berechnet automatisch, wie viel CO₂ und Geld durch das Nachfüllen gespart wurde.
 
-- 🔗 **Zugang über QR-Codes**  
-  QR-Codes können an touristischen Orten platziert werden und führen direkt zur Web-App.
+- **Community-Hinweise teilen**  
+  Nutzer:innen können kurze Erfahrungsberichte oder Hinweise zu einer Station posten.
+
+- **Mehrsprachigkeit**  
+  Die Web-App unterstützt Deutsch und Englisch.
+
+- **Mobile Nutzung**  
+  ReWater ist für Smartphones und die Nutzung unterwegs optimiert.
+
+- **Zugang über QR-Codes möglich**  
+  QR-Codes können an touristischen Orten platziert werden und direkt zur Web-App führen.
 
 ---
 
@@ -139,16 +130,20 @@ Die Web-App hilft dabei:
 
 ## 🛠️ Mögliche Technologien
 
-Für das Projekt könnten folgende Technologien verwendet werden:
+
+Für die ReWater-Web-App wurden folgende Technologien und APIs verwendet:
 
 - HTML
-- CSS
+- CSS 
 - JavaScript
-- React oder ein anderes Frontend-Framework
-- Karten-API
-- Open City Data
-- Community-Daten
-- QR-Code-Zugriff
+- Leaflet.js
+  Interaktive Karte zur Anzeige der Trinkwasser und Refill-Stationen.
+- OpenStreetMap  
+  Kartengrundlage und zusätzliche Refill-/Trinkwasser-Daten.
+- Overpass API 
+  Abruf von Trinkwasserstationen und öffentlichen Refill-Punkten aus OpenStreetMap.
+- Open Data Basel-Stadt 
+  Offizielle Brunnen- und Trinkwasser-Daten aus Basel.
 
 ---
 #SW Struktur
@@ -165,13 +160,3 @@ Unsere Vision ist es, kostenloses Trinkwasser in der Schweiz sichtbarer und einf
 Mit ReWater können Touristinnen und Touristen Städte erkunden, ihre Flaschen auffüllen, Geld sparen und Plastik vermeiden — alles über eine einfache Webapplikation.
 
 ---
-
-## 👥 Projektteam
-
-Dieses Projekt entsteht im Rahmen eines Hochschulprojekts an der **FHNW**.
-
----
-
-## 📌 Status
-
-🚧 Das Projekt befindet sich aktuell in der Konzept- und Prototyp-Phase.
