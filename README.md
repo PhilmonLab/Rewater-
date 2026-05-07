@@ -1,7 +1,7 @@
 
 # 💧 ReWater – Kostenlose Trinkwasserstationen in der Schweiz finden
 
-# Demo App src< https://philmonlab.github.io/Rewater-/>
+# Live Demo https://philmonlab.github.io/Rewater-/>
 
 ## 🌍 Projektübersicht
 
