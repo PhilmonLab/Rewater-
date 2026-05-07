@@ -1,8 +1,7 @@
 
 # 💧 ReWater – Kostenlose Trinkwasserstationen in der Schweiz finden
 
-# Live Demo https://philmonlab.github.io/Rewater-/>
-
+# Live Demo;  https://philmonlab.github.io/Rewater-/
 ## 🌍 Projektübersicht
 
 **ReWater** ist eine Webapplikation, die Touristinnen, Touristen und umweltbewussten Personen hilft, kostenlose Trinkwasserstationen in der Schweiz schnell und einfach zu finden.
