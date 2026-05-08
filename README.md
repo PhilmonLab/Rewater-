@@ -4,6 +4,9 @@
 # Live Demo;  https://philmonlab.github.io/Rewater-/
 ## 🌍 Projektübersicht
 
+
+<img src="assets/qr-rewater.png" alt="QR Code" width="200">
+
 **ReWater** ist eine Webapplikation, die Touristinnen, Touristen und umweltbewussten Personen hilft, kostenlose Trinkwasserstationen in der Schweiz schnell und einfach zu finden.
 
 Viele Touristinnen und Touristen kaufen unterwegs PET-Flaschen, weil sie nicht wissen, wo sie ihre eigene Flasche kostenlos nachfüllen können. Das führt zu unnötigem Plastikkonsum, mehr Abfall und zusätzlichen Kosten.
