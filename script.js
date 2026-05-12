@@ -167,6 +167,173 @@ const refillStations = [
     free: true
   }
 ];
+const swissSearchPlaces = [
+  {
+    name: "Zürich",
+    coordinates: [47.3769, 8.5417],
+    aliases: ["zurich", "zuerich", "zürich"]
+  },
+  {
+    name: "Genève",
+    coordinates: [46.2044, 6.1432],
+    aliases: ["geneva", "geneve", "genève", "genf"]
+  },
+  {
+    name: "Bern",
+    coordinates: [46.9481, 7.4474],
+    aliases: ["bern", "berne"]
+  },
+  {
+    name: "Basel",
+    coordinates: [47.5596, 7.5886],
+    aliases: ["basel", "bale"]
+  },
+  {
+    name: "Lausanne",
+    coordinates: [46.5197, 6.6323],
+    aliases: ["lausanne"]
+  },
+  {
+    name: "Winterthur",
+    coordinates: [47.4999, 8.7376],
+    aliases: ["winterthur"]
+  },
+  {
+    name: "Luzern",
+    coordinates: [47.0502, 8.3093],
+    aliases: ["luzern", "lucerne", "luzeren"]
+  },
+  {
+    name: "St. Gallen",
+    coordinates: [47.4245, 9.3767],
+    aliases: ["st gallen", "st. gallen", "sankt gallen"]
+  },
+  {
+    name: "Lugano",
+    coordinates: [46.0037, 8.9511],
+    aliases: ["lugano"]
+  },
+  {
+    name: "Biel/Bienne",
+    coordinates: [47.1368, 7.2468],
+    aliases: ["biel", "bienne", "biel bienne"]
+  },
+  {
+    name: "Thun",
+    coordinates: [46.7580, 7.6280],
+    aliases: ["thun"]
+  },
+  {
+    name: "Köniz",
+    coordinates: [46.9244, 7.4146],
+    aliases: ["koeniz", "köniz"]
+  },
+  {
+    name: "La Chaux-de-Fonds",
+    coordinates: [47.1035, 6.8328],
+    aliases: ["la chaux de fonds", "chaux de fonds"]
+  },
+  {
+    name: "Fribourg",
+    coordinates: [46.8065, 7.1619],
+    aliases: ["fribourg", "freiburg"]
+  },
+  {
+    name: "Schaffhausen",
+    coordinates: [47.6973, 8.6349],
+    aliases: ["schaffhausen"]
+  },
+  {
+    name: "Chur",
+    coordinates: [46.8508, 9.5320],
+    aliases: ["chur", "coire"]
+  },
+  {
+    name: "Neuchâtel",
+    coordinates: [46.9929, 6.9310],
+    aliases: ["neuchatel", "neuchâtel"]
+  },
+  {
+    name: "Sion",
+    coordinates: [46.2331, 7.3606],
+    aliases: ["sion", "sitten"]
+  },
+  {
+    name: "Uster",
+    coordinates: [47.3492, 8.7190],
+    aliases: ["uster"]
+  },
+  {
+    name: "Zug",
+    coordinates: [47.1662, 8.5155],
+    aliases: ["zug"]
+  },
+  {
+    name: "Yverdon-les-Bains",
+    coordinates: [46.7785, 6.6412],
+    aliases: ["yverdon", "yverdon les bains"]
+  },
+  {
+    name: "Rapperswil-Jona",
+    coordinates: [47.2267, 8.8174],
+    aliases: ["rapperswil", "rapperswil jona", "jona"]
+  },
+  {
+    name: "Montreux",
+    coordinates: [46.4312, 6.9107],
+    aliases: ["montreux"]
+  },
+  {
+    name: "Vevey",
+    coordinates: [46.4628, 6.8419],
+    aliases: ["vevey"]
+  },
+  {
+    name: "Aarau",
+    coordinates: [47.3925, 8.0442],
+    aliases: ["aarau"]
+  },
+  {
+    name: "Solothurn",
+    coordinates: [47.2088, 7.5323],
+    aliases: ["solothurn", "soleure"]
+  },
+  {
+    name: "Olten",
+    coordinates: [47.3490, 7.9033],
+    aliases: ["olten"]
+  },
+  {
+    name: "Baden",
+    coordinates: [47.4738, 8.3088],
+    aliases: ["baden"]
+  },
+  {
+    name: "Frauenfeld",
+    coordinates: [47.5578, 8.8989],
+    aliases: ["frauenfeld"]
+  },
+  {
+    name: "Bellinzona",
+    coordinates: [46.1956, 9.0238],
+    aliases: ["bellinzona"]
+  },
+  {
+    name: "Locarno",
+    coordinates: [46.1690, 8.7957],
+    aliases: ["locarno"]
+  },
+  {
+    name: "Davos",
+    coordinates: [46.8027, 9.8359],
+    aliases: ["davos"]
+  },
+  {
+    name: "Interlaken",
+    coordinates: [46.6863, 7.8632],
+    aliases: ["interlaken"]
+  }
+];
 let allStations = [...refillStations];
 
 function getSavedLanguage() {
@@ -197,6 +364,7 @@ const translations = {
     baselMapFallback: "Basel live data could not be loaded, so saved demo stations are shown.",
     swissMapReady: "Showing Basel official fountains plus Swiss refill stations from OpenStreetMap.",
     swissMapFallback: "Swiss OpenStreetMap refill stations could not be loaded yet.",
+    loadingPlaceStations: "Loading water stations near {place}...",
     noPhotoYet: "No photo yet",
     locating: "Asking for your location...",
     locationFound: "Showing refill stations within 10 km of you.",
@@ -321,6 +489,7 @@ const translations = {
     baselMapFallback: "Basel-Livedaten konnten nicht geladen werden, daher werden gespeicherte Demo-Stationen angezeigt.",
     swissMapReady: "Offizielle Basler Brunnen plus Schweizer Nachfüllstationen von OpenStreetMap werden angezeigt.",
     swissMapFallback: "Schweizer OpenStreetMap-Nachfüllstationen konnten noch nicht geladen werden.",
+    loadingPlaceStations: "Wasserstationen in der Nähe von {place} werden geladen...",
     noPhotoYet: "Noch kein Foto",
     locating: "Standort wird angefragt...",
     locationFound: "Nachfüllstationen im Umkreis von 10 km werden angezeigt.",
@@ -1277,10 +1446,50 @@ function handleStationSearch(event) {
     return searchableText.includes(query);
   });
 
+  if (matchingStations.length === 0) {
+    const matchingPlace = getMatchingSwissSearchPlace(query);
+    if (matchingPlace) {
+      focusSwissSearchPlace(matchingPlace);
+      return;
+    }
+  }
+
   renderStations(matchingStations);
   fitMapToStations(matchingStations, 16);
   const countLabel = translations[currentLanguage].searchResultsCount.replace("{count}", matchingStations.length);
   showNearMeStatus(countLabel);
+}
+
+function getMatchingSwissSearchPlace(query) {
+  const normalizedQuery = normalizeSearchText(query);
+  if (normalizedQuery.length < 3) {
+    return null;
+  }
+
+  return swissSearchPlaces.find(place =>
+    place.aliases.some(alias => {
+      const normalizedAlias = normalizeSearchText(alias);
+      return normalizedAlias === normalizedQuery
+        || normalizedAlias.startsWith(normalizedQuery)
+        || normalizedQuery.startsWith(normalizedAlias);
+    })
+  );
+}
+
+function normalizeSearchText(value) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function focusSwissSearchPlace(place) {
+  clearUserRange();
+  map.setView(place.coordinates, 14);
+  showNearMeStatus(translations[currentLanguage].loadingPlaceStations.replace("{place}", place.name));
+  scheduleVisibleSwissStationLoad();
 }
 
 function escapeHtml(value) {
