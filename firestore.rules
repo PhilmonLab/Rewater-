@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Refill records — users can only write and read their own
+    match /refills/{docId} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read:   if request.auth != null && resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // Station comments — any authenticated user can post; anyone can read
+    match /stations/{stationId}/comments/{commentId} {
+      allow create: if request.auth != null;
+      allow read:   if true;
+      allow update, delete: if false;
+    }
+
+    // Feedback — anyone (including anonymous) can submit; nobody can read/edit via client
+    match /feedback/{docId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+  }
+}

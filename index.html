@@ -217,6 +217,79 @@
           philmonlab.github.io/Rewater-/
         </a>
       </div>
+
+      <hr />
+
+      <!-- FEEDBACK FORM -->
+      <section class="feedback-section" aria-label="Feedback">
+        <h3 class="feedback-heading">FEEDBACK</h3>
+        <p class="feedback-sub">Teilen Sie Ihre Erfahrungen mit ReWater</p>
+
+        <form id="feedback-form" onsubmit="submitFeedback(event)" novalidate>
+
+          <!-- Ziel 1 -->
+          <div class="feedback-block">
+            <p class="feedback-goal-label">Ziel 1</p>
+            <p class="feedback-question">„ReWater hilft Nutzerinnen und Nutzern, ihren Wasserverbrauch besser zu verstehen."</p>
+            <div class="feedback-radio-group" role="radiogroup" aria-label="Ziel 1 Bewertung">
+              <label class="feedback-radio-label"><input type="radio" name="ziel1" value="4" required /> stimme voll und ganz zu</label>
+              <label class="feedback-radio-label"><input type="radio" name="ziel1" value="3" /> stimme zu</label>
+              <label class="feedback-radio-label"><input type="radio" name="ziel1" value="2" /> stimme weder zu noch nicht zu</label>
+              <label class="feedback-radio-label"><input type="radio" name="ziel1" value="1" /> stimme nicht zu</label>
+            </div>
+          </div>
+
+          <!-- Ziel 2 -->
+          <div class="feedback-block">
+            <p class="feedback-goal-label">Ziel 2</p>
+            <p class="feedback-question">„ReWater unterstützt Nutzerinnen und Nutzer dabei, Wasser bewusster und nachhaltiger zu verwenden."</p>
+            <div class="feedback-radio-group" role="radiogroup" aria-label="Ziel 2 Bewertung">
+              <label class="feedback-radio-label"><input type="radio" name="ziel2" value="4" required /> stimme voll und ganz zu</label>
+              <label class="feedback-radio-label"><input type="radio" name="ziel2" value="3" /> stimme zu</label>
+              <label class="feedback-radio-label"><input type="radio" name="ziel2" value="2" /> stimme weder zu noch nicht zu</label>
+              <label class="feedback-radio-label"><input type="radio" name="ziel2" value="1" /> stimme nicht zu</label>
+            </div>
+          </div>
+
+          <!-- Ziel 3 -->
+          <div class="feedback-block">
+            <p class="feedback-goal-label">Ziel 3</p>
+            <p class="feedback-question">„ReWater zeigt sinnvolle Möglichkeiten auf, wie Wasser wiederverwendet oder eingespart werden kann."</p>
+            <div class="feedback-radio-group" role="radiogroup" aria-label="Ziel 3 Bewertung">
+              <label class="feedback-radio-label"><input type="radio" name="ziel3" value="4" required /> stimme voll und ganz zu</label>
+              <label class="feedback-radio-label"><input type="radio" name="ziel3" value="3" /> stimme zu</label>
+              <label class="feedback-radio-label"><input type="radio" name="ziel3" value="2" /> stimme weder zu noch nicht zu</label>
+              <label class="feedback-radio-label"><input type="radio" name="ziel3" value="1" /> stimme nicht zu</label>
+            </div>
+          </div>
+
+          <hr />
+
+          <!-- Open questions -->
+          <div class="feedback-block">
+            <label class="feedback-question" for="fb-improve">Was sollte an dem erfahrenen System verbessert werden?</label>
+            <textarea id="fb-improve" name="improve" rows="3" class="feedback-textarea" placeholder="Ihre Antwort..."></textarea>
+          </div>
+
+          <div class="feedback-block">
+            <label class="feedback-question" for="fb-recommend">Was empfehlen Sie uns, um das System erfolgreich zu machen?</label>
+            <textarea id="fb-recommend" name="recommend" rows="3" class="feedback-textarea" placeholder="Ihre Antwort..."></textarea>
+          </div>
+
+          <div class="feedback-block">
+            <label class="feedback-question" for="fb-likelihood">Wie wahrscheinlich ist es, dass Sie das System nutzen werden?</label>
+            <textarea id="fb-likelihood" name="likelihood" rows="2" class="feedback-textarea" placeholder="Ihre Antwort..."></textarea>
+          </div>
+
+          <div class="feedback-block">
+            <label class="feedback-question" for="fb-strengths">Was sind die Stärken des erfahrenen Systems?</label>
+            <textarea id="fb-strengths" name="strengths" rows="3" class="feedback-textarea" placeholder="Ihre Antwort..."></textarea>
+          </div>
+
+          <button class="primary-btn" type="submit">Feedback absenden</button>
+          <p id="feedback-status" class="feedback-status hidden" aria-live="polite"></p>
+        </form>
+      </section>
     </section>
 
     <!-- ME / IMPACT PAGE -->

@@ -2374,3 +2374,58 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+async function submitFeedback(e) {
+  e.preventDefault();
+  const form = e.target;
+  const status = document.getElementById('feedback-status');
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  const allRadios = ['ziel1', 'ziel2', 'ziel3'];
+  for (const name of allRadios) {
+    if (!form.querySelector(`input[name="${name}"]:checked`)) {
+      status.textContent = 'Bitte beantworten Sie alle Pflichtfragen (Ziel 1–3).';
+      status.style.background = '#fdecea';
+      status.style.borderColor = '#e57373';
+      status.style.color = '#b71c1c';
+      status.classList.remove('hidden');
+      return;
+    }
+  }
+
+  const entry = {
+    ziel1: parseInt(form.querySelector('input[name="ziel1"]:checked').value),
+    ziel2: parseInt(form.querySelector('input[name="ziel2"]:checked').value),
+    ziel3: parseInt(form.querySelector('input[name="ziel3"]:checked').value),
+    improve:    form.querySelector('#fb-improve').value.trim(),
+    recommend:  form.querySelector('#fb-recommend').value.trim(),
+    likelihood: form.querySelector('#fb-likelihood').value.trim(),
+    strengths:  form.querySelector('#fb-strengths').value.trim(),
+    userId:     currentUser ? currentUser.uid : null,
+    userEmail:  currentUser ? currentUser.email : null,
+    submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Wird gesendet…';
+
+  try {
+    await fbDb.collection('feedback').add(entry);
+    status.textContent = 'Vielen Dank für Ihr Feedback!';
+    status.style.background = '#dff8ee';
+    status.style.borderColor = '#47c89f';
+    status.style.color = '#12664f';
+    status.classList.remove('hidden');
+    form.reset();
+  } catch (err) {
+    console.error('Feedback save failed:', err);
+    status.textContent = 'Fehler beim Senden. Bitte versuchen Sie es erneut.';
+    status.style.background = '#fdecea';
+    status.style.borderColor = '#e57373';
+    status.style.color = '#b71c1c';
+    status.classList.remove('hidden');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Feedback absenden';
+  }
+}
