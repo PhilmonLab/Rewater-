@@ -2381,14 +2381,38 @@ async function submitFeedback(e) {
   const status = document.getElementById('feedback-status');
   const submitBtn = form.querySelector('button[type="submit"]');
 
+  const showFeedbackError = (message) => {
+    status.textContent = message;
+    status.style.background = '#fdecea';
+    status.style.borderColor = '#e57373';
+    status.style.color = '#b71c1c';
+    status.classList.remove('hidden');
+  };
+
+  const getFeedbackErrorMessage = (err) => {
+    if (!firebaseReady || !fbDb) {
+      return 'Firebase ist nicht verbunden. Bitte prüfen Sie die Konfiguration.';
+    }
+
+    if (err && err.code === 'permission-denied') {
+      return 'Feedback konnte nicht gespeichert werden: Firestore-Regeln blockieren die Anfrage.';
+    }
+
+    if (err && (err.code === 'unavailable' || err.code === 'deadline-exceeded')) {
+      return 'Keine Verbindung zu Firebase. Bitte Internetverbindung prüfen und erneut versuchen.';
+    }
+
+    if (err && err.code === 'resource-exhausted') {
+      return 'Firebase-Limit erreicht. Bitte versuchen Sie es später erneut.';
+    }
+
+    return 'Fehler beim Senden. Bitte versuchen Sie es erneut.';
+  };
+
   const allRadios = ['ziel1', 'ziel2', 'ziel3'];
   for (const name of allRadios) {
     if (!form.querySelector(`input[name="${name}"]:checked`)) {
-      status.textContent = 'Bitte beantworten Sie alle Pflichtfragen (Ziel 1–3).';
-      status.style.background = '#fdecea';
-      status.style.borderColor = '#e57373';
-      status.style.color = '#b71c1c';
-      status.classList.remove('hidden');
+      showFeedbackError('Bitte beantworten Sie alle Pflichtfragen (Ziel 1-3).');
       return;
     }
   }
@@ -2419,11 +2443,7 @@ async function submitFeedback(e) {
     form.reset();
   } catch (err) {
     console.error('Feedback save failed:', err);
-    status.textContent = 'Fehler beim Senden. Bitte versuchen Sie es erneut.';
-    status.style.background = '#fdecea';
-    status.style.borderColor = '#e57373';
-    status.style.color = '#b71c1c';
-    status.classList.remove('hidden');
+    showFeedbackError(getFeedbackErrorMessage(err));
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Feedback absenden';
